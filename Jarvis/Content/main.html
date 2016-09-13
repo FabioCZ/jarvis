@@ -1,0 +1,18 @@
+﻿<md-content class="md-padding" layout-xs="column" layout="row">
+    <div flex-xs flex-gt-xs="50" layout="column">
+        <md-card ng-controller="UploadCtrl">
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">Choose a file to upload</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <lf-ng-md-file-input lf-files="fileToUpload" lf-browse-label="Select" lf-remove-label="Delete" lf-drag-and-drop-label="Drag and Drop here!" drag preview></lf-ng-md-file-input>
+
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button ng-click="submit()">Upload</md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
+</md-content>

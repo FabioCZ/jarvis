@@ -1,27 +1,49 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿<html lang="en">
 <head>
-  @Partial['_header.html'];
-  @Partial['_script.html'];
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Angular Material style sheet -->
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body onload="initHandlers()">
-  <a href="/"><img src="@Path['~/Content/jarvis.png']" alt="Jarvis logo" style='vertical-align: middle;' /></a>
-  @Partial['_version.html'];
-  <br />
-  <div style="position: absolute; top:0; right:0;">
-    <a href="/help">
-      <img src="@Path['~/Content/help.png']" alt="Help" />
-    </a>
-  </div>
-  <form style='font-family: Courier;'>
-    File:<input type='file' name='file' id='file' onchange='enableUpload();' />
-    <input type='button' id='uploadButton' value='Upload' onclick='uploadToJarvis("/run");' disabled />
-  </form>
-  <div id="filedrag">or drop file here</div>
+<body ng-app="JarvisApp" ng-cloak ng-controller="AppCtrl">
+    <md-content>
+        <md-toolbar class="md-hue-2">
+            <div class="md-toolbar-tools">
+                <h2>
+                    <span>Jarvis v{{jarvisVersion}}</span>
+                </h2>
+                <span flex></span>
+                <md-button class="md-icon-button" aria-label="Help" ng-click="showHelp($event)">
+                    <md-icon md-font-set="material-icons">help </md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+    </md-content>
 
-  <br />
-  <div id='output'>
-    <span style='font-family: Courier;'>Select and upload a file.</span>
-  </div>
+    <ng-view>
+        <!--routing outlet here-->
+    </ng-view>
+
+    <!-- Angular Material requires Angular.js Libraries -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+
+    <!-- Angular Material Library -->
+    <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <!-- file upload-->
+    <link rel="stylesheet" href="@Path['~/Content/lf-ng-md-file-input.min.css']">
+    <script src="@Path['~/Content/lf-ng-md-file-input.min.js']"></script>
+
+    <script src="@Path['~/Content/JarvisApp.js']"></script>
+
 </body>
+
 </html>
+
+<!--
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by an MIT-style license that can be in foundin the LICENSE file at http://material.angularjs.org/license.
+-->

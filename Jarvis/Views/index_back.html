@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  @Partial['_header.html'];
+  @Partial['_script.html'];
+</head>
+<body onload="initHandlers()">
+  <a href="/"><img src="@Path['~/Content/jarvis.png']" alt="Jarvis logo" style='vertical-align: middle;' /></a>
+  @Partial['_version.html'];
+  <br />
+  <div style="position: absolute; top:0; right:0;">
+    <a href="/help">
+      <img src="@Path['~/Content/help.png']" alt="Help" />
+    </a>
+  </div>
+  <form style='font-family: Courier;'>
+    File:<input type='file' name='file' id='file' onchange='enableUpload();' />
+    <input type='button' id='uploadButton' value='Upload' onclick='uploadToJarvis("/run");' disabled />
+  </form>
+  <div id="filedrag">or drop file here</div>
+
+  <br />
+  <div id='output'>
+    <span style='font-family: Courier;'>Select and upload a file.</span>
+  </div>
+</body>
+</html>
