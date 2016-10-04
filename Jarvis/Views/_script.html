@@ -47,6 +47,17 @@
         window.clearTimeout(dotterTimer);
         document.getElementById("output").innerHTML = xhttp.responseText;
       }
+      else if (xhttp.readyState === 4) //We have gotten a response, but it wasn't good
+      {
+        window.clearTimeout(dotterTimer);
+        document.getElementById("output").innerHTML = "<h1>There was an internal error with Jarvis. Please try again later.</h1>";
+        document.getElementById("output").innerHTML += "<h3>Please check if this error has been reported under the 'Jarvis' announcement on Canvas, and if not, please report it with the error message below.</h3>";
+
+        document.getElementById("output").innerHTML += "<span> The error message is: <code>" +
+          xhttp.responseText +
+          "</code></span>";
+      }
+
     };
 
     xhttp.open("POST", endpoint, true);
