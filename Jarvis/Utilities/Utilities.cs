@@ -107,7 +107,7 @@ namespace Jarvis
       text = text.Replace("\0", "<span style='color: #888888; font-size: 10px;'>\\0</span>");
       text = text.Replace("\a", "<span style='color: #888888; font-size: 10px;'>\\a</span>");
       text = text.Replace("\b", "<span style='color: #888888; font-size: 10px;'>\\b</span>");
-      text = text.Replace("\t", "<span style='color: #888888; font-size: 10px;'>\\t&emsp;</span>"); //replace ascii tab with HTML em space (this seemed to give the best results)
+      text = text.Replace("\t", "<span style='color: #888888;'>&#8677;</span>"); //replace ascii tab with HTML em space (this seemed to give the best results)
       text = text.Replace("\n", "<span style='color: #888888; font-size: 10px;'>\\n</span><br />");
       text = text.Replace("\v", "<span style='color: #888888; font-size: 10px;'>\\v</span>");
       text = text.Replace("\f", "<span style='color: #888888; font-size: 10px;'>\\f</span>");
