@@ -126,7 +126,7 @@ namespace Jarvis
       builder.Replace("&nbsp;", " ");
       builder.Replace("<br />", "\n");
 
-      return builder.Replace();
+      return builder.ToString();
     }
 
     public static void DirectoryCopy(string sourceDirName, string destDirName)
