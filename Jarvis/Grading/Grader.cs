@@ -205,8 +205,20 @@ namespace Jarvis
               test.Passed = false;
               htmlDiff = HtmlDiff.HtmlDiff.Execute(htmlActualStdOutput, htmlExpectedStdOutput);
             }
+            if (string.IsNullOrEmpty(actualStdOutput))
+            {
+              test.DiffBlocks.Add(BuildDiffBlock("From stdout: <br/> <span style=\"color:#ff0000\">Warning: actual output was empty!</span>", htmlActualStdOutput, htmlExpectedStdOutput, htmlDiff));
 
-            test.DiffBlocks.Add(BuildDiffBlock("From stdout:", htmlActualStdOutput, htmlExpectedStdOutput, htmlDiff));
+            }
+            else if (string.IsNullOrWhiteSpace(actualStdOutput))
+            {
+              test.DiffBlocks.Add(BuildDiffBlock("From stdout: <br/> <span style=\"color:#ff0000\">Warning: actual output was only whitespace!</span>", htmlActualStdOutput, htmlExpectedStdOutput, htmlDiff));
+
+            }
+            else
+            {
+              test.DiffBlocks.Add(BuildDiffBlock("From stdout:", htmlActualStdOutput, htmlExpectedStdOutput, htmlDiff));
+            }
           }
 
           // check for file output files
