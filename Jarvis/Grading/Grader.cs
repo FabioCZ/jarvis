@@ -286,8 +286,11 @@ namespace Jarvis
     private string BuildDiffBlock(string source, string htmlActualOutput, string htmlExpectedOutput, string htmlDiff)
     {
       StringBuilder result = new StringBuilder();
-      result.Append("<p>" + source + "</p>");
-      result.Append("<table>");
+      result.Append("<table style=\"margin-left: 35px;\">");
+      result.Append("<tr class=\"header expand\" >");
+      result.Append("<th colspan=\"1\"><span class=\"sign\"></span></th>");
+      result.Append($"<th colspan=\"2\">{source}</th>");
+      result.Append("</tr>");
       result.Append("<tr>");
       result.Append("<td>");
       result.Append("<h3>Actual</h3>");

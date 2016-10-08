@@ -23,7 +23,7 @@ namespace Jarvis
       {
         StringBuilder result = new StringBuilder();
 
-        string passedText = Passed ? "Passed" : "Failed";
+        string passedText = Passed ? "<span style=\"color:#00ff00\">Passed</span>" : "<span style=\"color:#ff0000\">Failed</span>";
 
         result.Append("<p style='display: inline;'>------------------------------------------------------------------</p>");
         result.Append("<h3 style='margin-top: 0px; margin-bottom: 0px;'>Test case " + Id.ToString() + ": " + passedText + "</h3>");
