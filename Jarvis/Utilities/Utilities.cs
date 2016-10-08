@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Xml;
+using System.Text;
 
 namespace Jarvis
 {
@@ -90,40 +91,42 @@ namespace Jarvis
 
     public static string ToHtmlEncoding(string text)
     {
-      text = text.Replace("<", "&lt;");
-      text = text.Replace(">", "&gt;");
-      text = text.Replace(" ", "&nbsp;");
-      text = text.Replace("\n", "<br />");
+      StringBuilder builder = new StringBuilder(text);
 
-      return text;
+      builder.Replace("<", "&lt;");
+      builder.Replace(">", "&gt;");
+      builder.Replace(" ", "&nbsp;");
+      builder.Replace("\n", "<br />");
+
+      return builder.ToString();
     }
 
     public static string ToHtmlEncodingWithNewLines(string text)
     {
-      text = text.Replace("<", "&lt;");
-      text = text.Replace(">", "&gt;");
-      text = text.Replace(" ", "&nbsp;");
-      //Handle ASCII non-printables
-      text = text.Replace("\0", "<span style='color: #888888; font-size: 10px;'>\\0</span>");
-      text = text.Replace("\a", "<span style='color: #888888; font-size: 10px;'>\\a</span>");
-      text = text.Replace("\b", "<span style='color: #888888; font-size: 10px;'>\\b</span>");
-      text = text.Replace("\t", "<span style='color: #888888;'>&#8677;</span>"); //replace ascii tab with Unicode "RIGHT ARROW TO BAR"
-      text = text.Replace("\n", "<span style='color: #888888; font-size: 10px;'>\\n</span><br />");
-      text = text.Replace("\v", "<span style='color: #888888; font-size: 10px;'>\\v</span>");
-      text = text.Replace("\f", "<span style='color: #888888; font-size: 10px;'>\\f</span>");
-      text = text.Replace("\r", "<span style='color: #888888; font-size: 10px;'>\\r</span>");
+      StringBuilder builder = new StringBuilder(text);
 
-      return text;
+      builder.Replace("<", "&lt;");
+      builder.Replace(">", "&gt;");
+      builder.Replace(" ", "&nbsp;");
+      builder.Replace("\0", "<span style='color: #888888; font-size: 10px;'>\\0</span>");
+      builder.Replace("\n", "<span style='color: #888888; font-size: 10px;'>\\n</span><br />");
+      builder.Replace("\v", "<span style='color: #888888; font-size: 10px;'>\\v</span>");
+      builder.Replace("\f", "<span style='color: #888888; font-size: 10px;'>\\f</span>");
+      builder.Replace("\r", "<span style='color: #888888; font-size: 10px;'>\\r</span>");
+
+      return builder.ToString();
     }
 
     public static string ToTextEncoding(string text)
     {
-      text = text.Replace("<", "&lt;");
-      text = text.Replace(">", "&gt;");
-      text = text.Replace("&nbsp;", " ");
-      text = text.Replace("<br />", "\n");
+      StringBuilder builder = new StringBuilder(text);
 
-      return text;
+      builder.Replace("<", "&lt;");
+      builder.Replace(">", "&gt;");
+      builder.Replace("&nbsp;", " ");
+      builder.Replace("<br />", "\n");
+
+      return builder.Replace();
     }
 
     public static void DirectoryCopy(string sourceDirName, string destDirName)

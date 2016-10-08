@@ -84,63 +84,66 @@ namespace Jarvis
     {
       string timestamp = DateTime.Now.ToString();
 
-      StreamWriter writer = new StreamWriter (homework.Path + "results.txt", true);
-      writer.WriteLine (timestamp + " " + homework.StudentId + " " + result.Grade); 
-      writer.Flush();
-      writer.Close();      
+      using (StreamWriter writer = new StreamWriter(homework.Path + "results.txt", true))
+      {
+        writer.WriteLine(timestamp + " " + homework.StudentId + " " + result.Grade); 
+        writer.Flush();
+        writer.Close();
+      }
     }
 
     private string StyleCheck (Assignment homework)
     {
-      Process p = new Process ();
-      
-      p.StartInfo.UseShellExecute = false;
-      p.StartInfo.RedirectStandardOutput = true;
-      p.StartInfo.RedirectStandardError = true;
+      string result = string.Empty;
+      using (Process p = new Process())
+      {
+        p.StartInfo.UseShellExecute = false;
+        p.StartInfo.RedirectStandardOutput = true;
+        p.StartInfo.RedirectStandardError = true;
 
-      string styleExe = Jarvis.Config.AppSettings.Settings["styleExe"].Value;
-      p.StartInfo.FileName = styleExe;
-      p.StartInfo.Arguments = Jarvis.Config.AppSettings.Settings["styleExemptions"].Value + " " + homework.FullPath;
+        string styleExe = Jarvis.Config.AppSettings.Settings["styleExe"].Value;
+        p.StartInfo.FileName = styleExe;
+        p.StartInfo.Arguments = Jarvis.Config.AppSettings.Settings["styleExemptions"].Value + " " + homework.FullPath;
 
-      Logger.Trace("Style checking with {0} and arguments {1}", styleExe, p.StartInfo.Arguments);
+        Logger.Trace("Style checking with {0} and arguments {1}", styleExe, p.StartInfo.Arguments);
 
-      p.Start();
-      Jarvis.StudentProcesses.Add(p.Id);
+        p.Start();
+        Jarvis.StudentProcesses.Add(p.Id);
 
-      string result = p.StandardError.ReadToEnd ();
-      result = result.Replace (homework.Path, "");
-      result = Utilities.ToHtmlEncoding(result);
-      p.WaitForExit();
+        result = p.StandardError.ReadToEnd();
+        result = result.Replace(homework.Path, "");
+        result = Utilities.ToHtmlEncoding(result);
+        p.WaitForExit();
 
-      p.Close();
-      p.Dispose();
+        p.Close();
+      }
 
       return result;
     }
 
     private string Compile(Assignment homework)
     {
-      Process p = new Process();
+      string result = "";
+      using (Process p = new Process())
+      {
+        p.StartInfo.UseShellExecute = false;
+        p.StartInfo.RedirectStandardOutput = true;
+        p.StartInfo.RedirectStandardError = true;
 
-      p.StartInfo.UseShellExecute = false;
-      p.StartInfo.RedirectStandardOutput = true;
-      p.StartInfo.RedirectStandardError = true;
+        p.StartInfo.FileName = "g++";
+        p.StartInfo.Arguments = "-DJARVIS -std=c++11 -Werror " + homework.FullPath + " -o" + homework.Path + homework.StudentId;
+        p.Start();
 
-      p.StartInfo.FileName = "g++";
-      p.StartInfo.Arguments = "-DJARVIS -std=c++11 -Werror " + homework.FullPath + " -o" + homework.Path + homework.StudentId;
-      p.Start();
+        Jarvis.StudentProcesses.Add(p.Id);
 
-      Jarvis.StudentProcesses.Add(p.Id);
+        result = p.StandardError.ReadToEnd();
+        result = result.Replace(homework.Path, "");
+        result = Utilities.ToHtmlEncoding(result);
 
-      string result = p.StandardError.ReadToEnd();
-      result = result.Replace(homework.Path, "");
-      result = Utilities.ToHtmlEncoding(result);
+        p.WaitForExit();
 
-      p.WaitForExit();
-
-      p.Close();
-      p.Dispose();
-
+        p.Close();
+      }
       Logger.Trace("Compile result: {0}", result);
 
       return (!string.IsNullOrEmpty(result)) ? result : "Success!!";
@@ -164,7 +167,7 @@ namespace Jarvis
           string stdInput = string.Empty;
 
           // clear out any previously created input/output files
-          System.IO.DirectoryInfo dir = new DirectoryInfo(homework.Path);
+          DirectoryInfo dir = new DirectoryInfo(homework.Path);
           foreach (FileInfo file in dir.GetFiles())
           {
             if (!file.Name.Contains(homework.StudentId) && !file.Name.Equals("results.txt"))
@@ -227,8 +230,8 @@ namespace Jarvis
             foreach (Tuple<string, string> fileout in test.FileOutputFiles)
             {
               string expectedOutput = Utilities.ReadFileContents(testsPath + fileout.Item1);
-
-              if (File.Exists(homework.Path + fileout.Item2))
+              FileInfo info = new FileInfo(homework.Path + fileout.Item2);
+              if (File.Exists(homework.Path + fileout.Item2) && info.Length < 1000000)
               {
                 string actualOutput = Utilities.ReadFileContents(homework.Path + fileout.Item2);
 
@@ -249,10 +252,15 @@ namespace Jarvis
 
                 test.DiffBlocks.Add(BuildDiffBlock("From " + fileout.Item2 + ":", htmlActualOutput, htmlExpectedOutput, htmlDiff));
               }
-              else
+              else if (!File.Exists(homework.Path + fileout.Item2))
               {
                 test.Passed = false;
                 test.DiffBlocks.Add("<p>Cannot find output file: " + fileout.Item2 + "</p>");
+              }
+              else if (info.Length >= 1000000)
+              {
+                test.Passed = false;
+                test.DiffBlocks.Add("<p>The file output was too large [" + info.Length.ToString() + "] bytes!!!");
               }
             }
           }
@@ -390,6 +398,14 @@ namespace Jarvis
         }
       }
 
+      // Check MOSS before grading so we don't have to wait for grading to find out if MOSS fails
+      string mossResponse = SendToMoss(hwPath, currentCourse, currentHomework);
+
+      if (string.IsNullOrEmpty(mossResponse))
+      {
+        return "MOSS Failed!";
+      }
+
       // run grader
       foreach (Assignment a in assignments)
       {     
@@ -422,10 +438,12 @@ namespace Jarvis
           GradingResult result = new GradingResult(a);
           gradingResults.Add(result);
         }
-
       }
 
-      string gradingReport = SendFilesToSectionLeaders(hwPath, currentCourse, currentHomework);
+      // add MOSS URL to result
+      string gradingReport = "<a href='" + mossResponse + "'>" + mossResponse + "</a><br />";
+
+      gradingReport += SendFilesToSectionLeaders(hwPath, currentCourse, currentHomework);
 
       string graderEmail = File.ReadAllText(hwPath + "../grader.txt");
 
@@ -436,13 +454,50 @@ namespace Jarvis
       string gradesPath = canvasFormatter.GenerateCanvasCsv(hwPath, currentHomework, gradingResults);
 
       SendEmail(graderEmail,
-                "Grades for " + currentCourse + " " + currentHomework,
-                "Hello! Attached are the grades for " + currentCourse + " " + currentHomework + ". Happy grading!",
-                gradesPath);
+        "Grades for " + currentCourse + " " + currentHomework,
+        "Hello! Attached are the grades for " + currentCourse + " " + currentHomework + ". Happy grading!\n" + mossResponse,
+        gradesPath);
 
       // Generate some kind of grading report
       return gradingReport;
     }
+
+    private string SendToMoss(string hwPath, string currentCourse, string currentHomework)
+    {
+      // Submit all files to MOSS
+      string mossId = Jarvis.Config.AppSettings.Settings["mossId"].Value;
+
+      // Find all *.cpp files in hw directory
+      string[] cppFiles = Directory.GetFiles(hwPath, "*.cpp", SearchOption.AllDirectories);
+
+      Logger.Info("Submitting {0} files to MOSS", cppFiles.Length);
+      // create moss interface
+      MossInterface moss = new MossInterface
+      {
+        UserId = Int32.Parse(mossId), 
+        Language = "cc", // C++
+        NumberOfResultsToShow = 500,
+        Comments = string.Format("USU - Jarvis - {0} - HW {1}", currentCourse, currentHomework),
+      };
+
+      // add files to interface
+      moss.Files = new List<string>(cppFiles);
+
+      // submit request
+      string mossReponse = string.Empty;
+      if (moss.SendRequest(out mossReponse))
+      {
+        Logger.Info("Moss returned success! {0}", mossReponse);
+      }
+      else
+      {
+        mossReponse = "";
+        Logger.Warn("Moss submission unsuccessful");
+      }
+
+      return mossReponse;
+    }
+
 
     private void SendEmail(string to, string subject, string body, string attachment)
     {
@@ -454,6 +509,8 @@ namespace Jarvis
       mail.Attachments.Add(new Attachment(attachment));
 
       mailClient.Send(mail);
+
+      mailClient.Dispose();
     }
 
     private string SendFilesToSectionLeaders(string hwPath, string currentCourse, string currentHomework)

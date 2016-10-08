@@ -64,13 +64,13 @@
     <Compile Include="Uploader\FileUploadRequestBinder.cs" />
     <Compile Include="Grading\Grader.cs" />
     <Compile Include="Grading\GradingResult.cs" />
-    <Compile Include="Grading\CheatDetection.cs" />
-    <Compile Include="Canvas\CanvasFormatter.cs" />
     <Compile Include="Grading\TestCase.cs" />
     <Compile Include="Grading\Assignment.cs" />
     <Compile Include="Utilities\Logger.cs" />
     <Compile Include="Utilities\StatsManager.cs" />
     <Compile Include="Utilities\Utilities.cs" />
+    <Compile Include="Grading\CanvasFormatter.cs" />
+    <Compile Include="Grading\MossInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -125,7 +125,6 @@
   -->
   <ItemGroup />
   <ItemGroup>
-    <Folder Include="Canvas\" />
     <Folder Include="Utilities\" />
   </ItemGroup>
 </Project>
